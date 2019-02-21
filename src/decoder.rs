@@ -5,53 +5,57 @@ use std::{convert, io};
 
 #[macro_export]
 macro_rules! get_field_with_default {
-    ($m:expr, $field:expr, $default:expr) => (
+    ($m:expr, $field:expr, $default:expr) => {
         match $m.get(&ByteString::from_str($field)) {
-                        Some(a) => FromBencode::from_bencode(a)?,
-                                    None => $default
-                                                }
-                                                    )
+            Some(a) => FromBencode::from_bencode(a)?,
+            None => $default,
+        }
+    };
 }
 
 #[macro_export]
 macro_rules! get_field {
-    ($m:expr, $field:expr) => (
-            get_field_with_default!($m, $field, return Err(decoder::Error::DoesntContain($field)))
-                    )
+    ($m:expr, $field:expr) => {
+        get_field_with_default!(
+            $m,
+            $field,
+            return Err(decoder::Error::DoesntContain($field))
+        )
+    };
 }
 
 #[macro_export]
 macro_rules! get_optional_field {
-    ($m:expr, $field:expr) => (
-                get_field_with_default!($m, $field, None)
-                    )
+    ($m:expr, $field:expr) => {
+        get_field_with_default!($m, $field, None)
+    };
 }
 
 #[macro_export]
 macro_rules! get_raw_field {
-    ($m:expr, $field:expr) => (
+    ($m:expr, $field:expr) => {
         match $m.get(&ByteString::from_str($field)) {
-                        Some(a) => a,
-                                    None => return Err(decoder::Error::DoesntContain($field))
-                                                }
-                                                    )
+            Some(a) => a,
+            None => return Err(decoder::Error::DoesntContain($field)),
+        }
+    };
 }
 
 #[macro_export]
 macro_rules! get_field_as_bencoded_bytes {
-    ($m:expr, $field:expr) => (
-                get_raw_field!($m, $field).to_bytes().unwrap() )
-                   
+    ($m:expr, $field:expr) => {
+        get_raw_field!($m, $field).to_bytes().unwrap()
+    };
 }
 
 #[macro_export]
 macro_rules! get_field_as_bytes {
-    ($m:expr, $field:expr) => (
+    ($m:expr, $field:expr) => {
         match get_raw_field!($m, $field) {
-                        &Bencode::ByteString(ref v) => v.clone(),
-                                    _ => return Err(decoder::Error::NotAByteString)
-                                                }
-                                                    )
+            &Bencode::ByteString(ref v) => v.clone(),
+            _ => return Err(decoder::Error::NotAByteString),
+        }
+    };
 }
 
 #[derive(Debug)]

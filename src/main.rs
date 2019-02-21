@@ -1,35 +1,36 @@
+extern crate bencode;
+extern crate hyper;
+extern crate url;
+
+use bencode::util::ByteString;
+use bencode::{Bencode, FromBencode};
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::BufReader;
-use std::fs;
-use bencode::util::ByteString;
-extern crate bencode;
-use bencode::{Bencode, FromBencode};
+use std::net::UdpSocket;
 mod decoder;
 mod hash;
-/*
-#[derive(RustcEncodable, RustcDecodable, PartialEq)]
-struct MyStruct {
-        a: i32,
-        b: String,
-        c: Vec<u8>,
-}
-*/
+
+use self::hyper::header::Connection;
+use self::hyper::Client;
+use self::url::percent_encoding::{percent_encode };
 
 fn main() -> std::io::Result<()> {
     let mut file = File::open("ubuntu.torrent")?;
-    //println!("{:?}", buf_reader);
     let mut contents = Vec::new();
     file.read_to_end(&mut contents)?;
-    println!("{:?}", contents);
     let bencode: bencode::Bencode = bencode::from_vec(contents).unwrap();
-    //let mut decoder = Decoder::new(&bencode);
-    //let result = Decodable::decode(&mut decoder).unwrap();
-    let result : Metainfo = FromBencode::from_bencode(&bencode).unwrap();
-    dbg!(result);
+    let result: Metainfo = FromBencode::from_bencode(&bencode).unwrap();
+    dbg!(&result.announce);
+    let url = format!("{}", result.announce);
+
+    let mut client = Client::new();
+    let mut http_res = client.get(&url).header(Connection::close()).send().unwrap();
+    let mut body = Vec::new();
+    http_res.read_to_end(&mut body).unwrap();
+    dbg!(&body);
+
     Ok(())
 }
-
 
 use hash::{calculate_sha1, Sha1};
 
@@ -53,7 +54,7 @@ impl FromBencode for Metainfo {
                 let metainfo = Metainfo {
                     announce: get_field!(m, "announce"),
                     info: get_field!(m, "info"),
-                    info_hash, 
+                    info_hash,
                     created_by: get_field_with_default!(m, "created by", "".to_string()),
                 };
                 Ok(metainfo)
@@ -89,6 +90,7 @@ impl FromBencode for Info {
                     name: get_field!(m, "name"),
                     length: get_field!(m, "length"),
                 };
+
                 Ok(info)
             }
             _ => Err(decoder::Error::NotADict),

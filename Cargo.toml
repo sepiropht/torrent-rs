@@ -5,6 +5,9 @@ authors = ["sepiropht <sergembotta@mailoo.org>"]
 edition = "2018"
 
 [dependencies]
+url = "1.7.2"
+hyper = "0.5"
+rand = "0.3"
 rust-crypto = "0.2"
 [dependencies.bencode]
 
