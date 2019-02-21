@@ -5,3 +5,7 @@ authors = ["sepiropht <sergembotta@mailoo.org>"]
 edition = "2018"
 
 [dependencies]
+rust-crypto = "0.2"
+[dependencies.bencode]
+
+git = "https://github.com/arjantop/rust-bencode.git"
