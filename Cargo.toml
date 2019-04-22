@@ -9,6 +9,5 @@ url = "1.7.2"
 hyper = "0.5"
 rand = "0.3"
 rust-crypto = "0.2"
-[dependencies.bencode]
+simple_bencode = "0.1.4"
 
-git = "https://github.com/arjantop/rust-bencode.git"
