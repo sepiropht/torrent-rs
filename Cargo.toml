@@ -5,11 +5,8 @@ authors = ["sepiropht <sergembotta@mailoo.org>"]
 edition = "2018"
 
 [dependencies]
-hyper = "0.5"
-rand = "0.3"
-rust-crypto = "0.2"
-simple_bencode = "0.1.4"
-
-[dependencies.url]
-git = "https://github.com/servo/rust-url"
+bencode = "0.1.16"
+bendy = "0.3.3"
+dns-lookup = "1.0.8"
+url = "2.3.1"
 
